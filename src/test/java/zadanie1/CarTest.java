@@ -1,5 +1,6 @@
 package zadanie1;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,15 +27,18 @@ public class CarTest {
     @InjectMocks
     private CarService carService = new CarService();
 
-    @Test
-    void testYearMileageWholeRange() {
+    @BeforeEach
+    void doBefore() {
         for (int i = 2000; i <= 2010; i++) {
             yearMileage.put(Integer.toString(i), (long) (i * 10));
         }
 
         when(carDAO.findById(anyLong())).thenReturn(car);
         when(car.getYearMileage()).thenReturn(yearMileage);
+    }
 
+    @Test
+    void testYearMileageWholeRange() {
         long mileage = carService.findMileageBetweenYears(anyLong(), "2000", "2010");
 
         assertEquals(220550, mileage);
@@ -42,13 +46,6 @@ public class CarTest {
 
     @Test
     void testYearMileageBeforeRange() {
-        for (int i = 2000; i <= 2010; i++) {
-            yearMileage.put(Integer.toString(i), (long) (i * 10));
-        }
-
-        when(carDAO.findById(anyLong())).thenReturn(car);
-        when(car.getYearMileage()).thenReturn(yearMileage);
-
         long mileage = carService.findMileageBetweenYears(anyLong(), "1990", "1999");
 
         assertEquals(0, mileage);
@@ -56,14 +53,14 @@ public class CarTest {
 
     @Test
     void testYearMileageAfterRange() {
-        for (int i = 2000; i <= 2010; i++) {
-            yearMileage.put(Integer.toString(i), (long) (i * 10));
-        }
-
-        when(carDAO.findById(anyLong())).thenReturn(car);
-        when(car.getYearMileage()).thenReturn(yearMileage);
-
         long mileage = carService.findMileageBetweenYears(anyLong(), "2011", "2019");
+
+        assertEquals(0, mileage);
+    }
+
+    @Test
+    void testYearMileagePartlyRange() {
+        long mileage = carService.findMileageBetweenYears(anyLong(), "1990", "1999");
 
         assertEquals(0, mileage);
     }
